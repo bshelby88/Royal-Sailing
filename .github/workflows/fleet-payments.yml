@@ -1,0 +1,23 @@
+name: Fleet Payment Monitor
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check-payments:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check payments
+        env:
+          FLEET_WALLET: ${{ secrets.FLEET_WALLET }}
+          BASE_RPC: https://mainnet.base.org
+        run: python cloud-fleet/orchestrator.py payments

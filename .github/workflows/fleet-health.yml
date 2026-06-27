@@ -1,0 +1,23 @@
+name: Fleet Health Check
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Health check all services
+        env:
+          FLEET_WALLET: ${{ secrets.FLEET_WALLET }}
+          BASE_RPC: https://mainnet.base.org
+        run: python cloud-fleet/orchestrator.py health

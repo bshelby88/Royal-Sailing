@@ -1,0 +1,5 @@
+# No external dependencies — uses stdlib only (urllib, json)
+# If you want richer SDKs later:
+# pyairtable==2.3.0
+# PyGithub==2.4.0
+# requests==2.32.3
