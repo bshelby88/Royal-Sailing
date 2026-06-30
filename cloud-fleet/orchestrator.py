@@ -12,8 +12,8 @@ import urllib.error
 import urllib.parse
 from datetime import datetime, timezone
 
-OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
-AIRTABLE_PAT = os.environ["AIRTABLE_PAT"]
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+AIRTABLE_PAT = os.environ.get("AIRTABLE_PAT", "")
 AIRTABLE_BASE = os.environ.get("AIRTABLE_BASE", "appHjVD4pMobyUyNj")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 DEFAULT_MODEL = os.environ.get("FLEET_MODEL", "google/gemini-2.5-flash")
