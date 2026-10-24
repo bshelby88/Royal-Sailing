@@ -1,0 +1,48 @@
+# ---------------------------------------------------------------------------
+# Consolidated Fleet Operations — replaces fleet-cycle, fleet-health, fleet-payments
+# Runs on schedule (every 6h) + manual dispatch
+# ---------------------------------------------------------------------------
+name: Fleet Operations
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Operation mode'
+        required: true
+        default: 'cycle'
+        type: choice
+        options:
+          - cycle
+          - health
+          - payments
+
+concurrency:
+  group: fleet-ops-${{ github.ref }}-${{ github.event.inputs.mode || 'cycle' }}
+  cancel-in-progress: true
+
+jobs:
+  fleet-ops:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      AIRTABLE_PAT: ${{ secrets.AIRTABLE_PAT }}
+      AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
+      GITHUB_TOKEN: ${{ secrets.FLEET_GITHUB_TOKEN }}
+      FLEET_MODEL: ${{ vars.FLEET_MODEL || 'google/gemini-2.5-flash' }}
+      FLEET_REASONING_MODEL: ${{ vars.FLEET_REASONING_MODEL || 'anthropic/claude-sonnet-4-6' }}
+      MAX_COST_PER_RUN: '0.25'
+      FLEET_WALLET: ${{ secrets.FLEET_WALLET }}
+      BASE_RPC: https://mainnet.base.org
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run fleet operation
+        run: python cloud-fleet/orchestrator.py ${{ github.event.inputs.mode || 'cycle' }}
